@@ -70,32 +70,16 @@
 Напишите SQL-запросы для создания пяти VIEW (по одному на каждую таблицу) и выполните их. Для проверки предоставьте код создания VIEW.
 
 ```{SQL} 
-CREATE VIEW analysis.orderitems AS SELECT * FROM production.orderitems;
-CREATE VIEW analysis.orderstatuses AS SELECT * FROM production.orderstatuses;
-CREATE VIEW analysis.products AS SELECT * FROM production.products;
-CREATE VIEW analysis.users AS SELECT * FROM production.users;
-
-CREATE VIEW analysis.orders AS (
-SELECT 
-    po.order_id,
-    po.order_ts,
-    po.user_id,
-    po.bonus_payment,
-    po.payment,
-    po.cost,
-    po.bonus_grant,
-    subq.last_status AS status
-FROM production.orders AS po
-LEFT JOIN (
-    SELECT slog.order_id, stat.key AS last_status
-    FROM (
-        SELECT order_id, MAX(dttm) AS last_status_update
-        FROM production.orderstatuslog
-        GROUP BY order_id) AS slog
-    LEFT JOIN production.orderstatuslog ON slog.order_id=production.orderstatuslog.order_id AND slog.last_status_update=production.orderstatuslog.dttm 
-    LEFT JOIN production.orderstatuses AS stat ON orderstatuslog.status_id=stat.id) AS subq
-ON po.order_id=subq.order_id
-WHERE po.order_ts >='2021-01-01')
+create view analysis.orderitems as 
+select * from production.orderitems;
+create view analysis.orderstatuses as
+select * from production.orderstatuses;
+create view analysis.products as
+select * from production.products;
+create view analysis.users as
+select * from production.users;
+create view analysis.orders as
+select * from production.orders;
 ```
 
 
