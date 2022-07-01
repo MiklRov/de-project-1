@@ -198,7 +198,7 @@ from analysis.dm_rfm_segments;
 ## 2. Доработка представлений.
 
 ``` Sql
-create view analysis.orders as 
+create or replace view analysis.orders as 
 (
 select 
     po.order_id,
@@ -214,7 +214,7 @@ left join
 	(
     select slog.order_id, stat.key as last_status
     from (
-        select order_id, Mmax(dttm) as last_status_update
+        select order_id, max(dttm) as last_status_update
         from production.orderstatuslog
         group by order_id) as slog
     left join production.orderstatuslog on slog.order_id=production.orderstatuslog.order_id and slog.last_status_update=production.orderstatuslog.dttm 
