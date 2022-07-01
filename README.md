@@ -69,7 +69,7 @@
 
 Напишите SQL-запросы для создания пяти VIEW (по одному на каждую таблицу) и выполните их. Для проверки предоставьте код создания VIEW.
 
-`{SQL} 
+```{SQL} 
 {CREATE VIEW analysis.orderitems AS SELECT * FROM production.orderitems;
 CREATE VIEW analysis.orderstatuses AS SELECT * FROM production.orderstatuses;
 CREATE VIEW analysis.products AS SELECT * FROM production.products;
@@ -96,7 +96,7 @@ LEFT JOIN (
     LEFT JOIN production.orderstatuses AS stat ON orderstatuslog.status_id=stat.id) AS subq
 ON po.order_id=subq.order_id
 WHERE po.order_ts >='2021-01-01')}
-`
+```
 
 
 
