@@ -2,7 +2,6 @@
 # Витрина RFM
 
 ## 1.1. Выясните требования к целевой витрине.
-
 Постановка задачи выглядит достаточно абстрактно - постройте витрину. Первым делом вам необходимо выяснить у заказчика детали. Запросите недостающую информацию у заказчика в чате.
 
 Зафиксируйте выясненные требования. Составьте документацию готовящейся витрины на основе заданных вами вопросов, добавив все необходимые детали.
@@ -11,16 +10,17 @@
 Задача: построить витрину для RFM-классификации клиентов. 
 Отбор данных: 
 1. Заказы со статусом CLOSED.
-2. Период с начала 2021 год
+2. Период с начала 2022 год
 3. Обновление данных не требуется
 
 Название витрины: dm_rfm_segments (схема analysis)
 Источник данных: таблицы из схемы production
-Поля витрины:
-1. user_id PK
-2. recency smallint - рейтинг число от 1 до 5
-3. frequency smallint - рейтинг число от 1 до 5)
-4. monetary_value smallint - рейтинг число от 1 до 5
+
+Витрина должна состоять из таких полей:
+1. user_id
+2. recency (число от 1 до 5)
+3. frequency (число от 1 до 5)
+4. monetary_value (число от 1 до 5)
 
 Критерии присвоения рейтинга:
 * Фактор Recency измеряется по последнему заказу. Распределите клиентов по шкале от одного до пяти, где значение 1 получат те, кто либо вообще не делал заказов, либо делал их очень давно, а 5 — те, кто заказывал относительно недавно.
@@ -70,17 +70,62 @@
 Напишите SQL-запросы для создания пяти VIEW (по одному на каждую таблицу) и выполните их. Для проверки предоставьте код создания VIEW.
 
 ```SQL 
-create view analysis.orderitems as 
+create view analysis.orderitems as
 select * from production.orderitems;
+
 create view analysis.orderstatuses as
 select * from production.orderstatuses;
+
 create view analysis.products as
 select * from production.products;
+
 create view analysis.users as
 select * from production.users;
-create view analysis.orders as
-select * from production.orders;
+
+create view analysis.orders as 
+(
+select 
+    po.order_id,
+    po.order_ts,
+    po.user_id,
+    po.bonus_payment,
+    po.payment,
+    po.cost,
+    po.bonus_grant,
+    subq.last_status AS status
+from production.orders AS po
+left join 
+	(
+    select slog.order_id, stat.key as last_status
+    from (
+        select order_id, Mmax(dttm) as last_status_update
+        from production.orderstatuslog
+        group by order_id) as slog
+    left join production.orderstatuslog on slog.order_id=production.orderstatuslog.order_id and slog.last_status_update=production.orderstatuslog.dttm 
+    left join production.orderstatuses as stat on orderstatuslog.status_id=stat.id) as subq
+on po.order_id=subq.order_id
+where po.order_ts >='2022-01-01');
 ```
+1.4.2. Напишите DDL-запрос для создания витрины.**
+Далее вам необходимо создать витрину. Напишите CREATE TABLE запрос и выполните его на предоставленной базе данных в схеме analysis.
+
+```SQL
+CREATE TABLE analysis.dm_rfm_segments (
+    user_id int PRIMARY KEY,
+    recency smallint CHECK(recency>0 AND recency<=5),
+    frequency smallint CHECK(frequency>0 AND recency<=5),
+    monetary_value smallint CHECK(monetary_value>0 AND monetary_value<=5)
+)
+```
+
+
+1.4.3. Напишите SQL запрос для заполнения витрины
+Наконец, реализуйте расчет витрины на языке SQL и заполните таблицу, созданную в предыдущем пункте.
+
+Для решения предоставьте код запроса.
+
+--Впишите сюда ваш ответ
+
 
 
 
