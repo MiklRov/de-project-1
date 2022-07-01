@@ -69,7 +69,7 @@
 
 Напишите SQL-запросы для создания пяти VIEW (по одному на каждую таблицу) и выполните их. Для проверки предоставьте код создания VIEW.
 
-```{SQL} 
+```SQL 
 create view analysis.orderitems as 
 select * from production.orderitems;
 create view analysis.orderstatuses as
