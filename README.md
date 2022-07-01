@@ -141,6 +141,25 @@ create table analysis.dm_rfm_segments (
 Для решения предоставьте код запроса.
 
 ```SQL
+
+create table analysis.tmp_rfm_recency (
+ user_id INT not null primary key,
+ recency INT not null check(recency >= 1
+and recency <= 5)
+);
+
+create table analysis.tmp_rfm_frequency (
+ user_id INT not null primary key,
+ frequency INT not null check(frequency >= 1
+and frequency <= 5)
+);
+
+create table analysis.tmp_rfm_monetary_value (
+ user_id INT not null primary key,
+ monetary_value INT not null check(monetary_value >= 1
+and monetary_value <= 5)
+);
+
 with pivot_table as (
 select
 	user_id,
