@@ -70,41 +70,54 @@
 Напишите SQL-запросы для создания пяти VIEW (по одному на каждую таблицу) и выполните их. Для проверки предоставьте код создания VIEW.
 
 ```SQL 
-create view analysis.orderitems as
-select * from production.orderitems;
+create or replace
+view analysis.orderitems as
+select
+	*
+from
+	production.orderitems;
 
-create view analysis.orderstatuses as
-select * from production.orderstatuses;
+create or replace
+view analysis.orderstatuses as
+select
+	*
+from
+	production.orderstatuses;
 
-create view analysis.products as
-select * from production.products;
+create or replace
+view analysis.products as
+select
+	*
+from
+	production.products;
 
-create view analysis.users as
-select * from production.users;
+create or replace
+view analysis.users as
+select
+	*
+from
+	production.users;
 
-create view analysis.orders as 
+create or replace
+view analysis.orders as 
 (
-select 
-    po.order_id,
-    po.order_ts,
-    po.user_id,
-    po.bonus_payment,
-    po.payment,
-    po.cost,
-    po.bonus_grant,
-    subq.last_status AS status
-from production.orders AS po
-left join 
-	(
-    select slog.order_id, stat.key as last_status
-    from (
-        select order_id, Mmax(dttm) as last_status_update
-        from production.orderstatuslog
-        group by order_id) as slog
-    left join production.orderstatuslog on slog.order_id=production.orderstatuslog.order_id and slog.last_status_update=production.orderstatuslog.dttm 
-    left join production.orderstatuses as stat on orderstatuslog.status_id=stat.id) as subq
-on po.order_id=subq.order_id
-where po.order_ts >='2022-01-01');
+select
+	o.order_id,
+	o.order_ts,
+	o.user_id,
+	o.bonus_payment,
+	o.payment,
+	o.cost,
+	o.bonus_grant,
+	po.key as status
+from
+	production.orders o
+left join production.orderstatuses po on
+	o.status = po.id
+where
+	po.key = 'Closed'
+	and
+	o.order_ts >= '2022-01-01');
 ```
 1.4.2. Напишите DDL-запрос для создания витрины.**
 Далее вам необходимо создать витрину. Напишите CREATE TABLE запрос и выполните его на предоставленной базе данных в схеме analysis.
@@ -182,7 +195,33 @@ analysis.users.id;
 select *
 from analysis.dm_rfm_segments;
 ```
+## 2. Доработка представлений.
 
+``` Sql
+create view analysis.orders as 
+(
+select 
+    po.order_id,
+    po.order_ts,
+    po.user_id,
+    po.bonus_payment,
+    po.payment,
+    po.cost,
+    po.bonus_grant,
+    subq.last_status AS status
+from production.orders AS po
+left join 
+	(
+    select slog.order_id, stat.key as last_status
+    from (
+        select order_id, Mmax(dttm) as last_status_update
+        from production.orderstatuslog
+        group by order_id) as slog
+    left join production.orderstatuslog on slog.order_id=production.orderstatuslog.order_id and slog.last_status_update=production.orderstatuslog.dttm 
+    left join production.orderstatuses as stat on orderstatuslog.status_id=stat.id) as subq
+on po.order_id=subq.order_id
+where po.order_ts >='2022-01-01');
+```
 
 
 
