@@ -110,12 +110,15 @@ where po.order_ts >='2022-01-01');
 Далее вам необходимо создать витрину. Напишите CREATE TABLE запрос и выполните его на предоставленной базе данных в схеме analysis.
 
 ```SQL
-CREATE TABLE analysis.dm_rfm_segments (
-    user_id int PRIMARY KEY,
-    recency smallint CHECK(recency>0 AND recency<=5),
-    frequency smallint CHECK(frequency>0 AND recency<=5),
-    monetary_value smallint CHECK(monetary_value>0 AND monetary_value<=5)
-)
+create table analysis.dm_rfm_segments (
+    user_id int primary key,
+    recency smallint check(recency>0
+	and recency <= 5),
+    frequency smallint check(frequency>0
+	and recency <= 5),
+    monetary_value smallint check(monetary_value>0
+	and monetary_value <= 5)
+);
 ```
 
 
@@ -124,8 +127,61 @@ CREATE TABLE analysis.dm_rfm_segments (
 
 Для решения предоставьте код запроса.
 
---Впишите сюда ваш ответ
+```SQL
+with pivot_table as (
+select
+	user_id,
+	MAX(order_ts) as last_order,
+	SUM("cost") as total_amount,
+	COUNT(order_id) as order_quantity
+from
+	analysis.orders
+where
+	status = 'Closed'
+group by
+	user_id)
 
+insert
+	into
+	analysis.dm_rfm_segments
+select
+	analysis.users.id as user_id,
+	ntile(5) over (
+	order by (case
+		when last_order is null then (
+		select
+			min(last_order)
+		from
+			pivot_table)
+		else last_order
+	end) asc) as recency,
+	ntile(5) over (
+	order by (case
+		when total_amount is null then (
+		select
+			min(total_amount)
+		from
+			pivot_table)
+		else total_amount
+	end) asc) as monetary_value,
+	ntile(5) over (
+	order by (case
+		when order_quantity is null then (
+		select
+			min(order_quantity)
+		from
+			pivot_table)
+		else order_quantity
+	end) asc) as frequency
+from pivot_table
+right join analysis.users on
+pivot_table.user_id = analysis.users.id
+order by
+analysis.users.id;
+
+select *
+from analysis.dm_rfm_segments;
+```
 
 
 
