@@ -1,19 +1,18 @@
 with last_order_table as (
 select
-	user_id,
+	user_id ,
 	MAX(order_ts) as last_order
 from
-	analysis.orders
+	analysis.orders ao
 where
-	status = 'Closed'
+	status = 5
 group by
 	user_id)
-
 insert
 	into
 	analysis.tmp_rfm_recency
 select
-	analysis.users.id as user_id,
+	au.id as user_id,
 	ntile(5) over (
 order by
 	(case
@@ -25,8 +24,7 @@ order by
 		else last_order
 	end) asc) as recency
 from
-	last_order_table
-right join analysis.users
-		using(users.id)
+	last_order_table lot
+right join analysis.users au on lot.user_id=au.id
 order by
-	analysis.users.id;
+	au.id;

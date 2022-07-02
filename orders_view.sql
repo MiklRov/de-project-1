@@ -35,3 +35,4 @@ on
 	po.order_id = subq.order_id
 where
 	po.order_ts >= '2022-01-01');
+

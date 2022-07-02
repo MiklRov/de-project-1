@@ -5,15 +5,14 @@ select
 from
 	analysis.orders
 where
-	status = 'Closed'
+	status = 5
 group by
 	user_id)
-
 insert
 	into
 	analysis.tmp_rfm_frequency
 select
-	analysis.users.id as user_id,
+	au.id as user_id,
 	ntile(5) over (
 order by
 	(case
@@ -25,8 +24,7 @@ order by
 		else order_quantity
 	end) asc) as frequency
 from
-	order_quantity_table
-right join analysis.users
-		using(users.id)
+	order_quantity_table oqt
+right join analysis.users au on oqt.user_id=au.id
 order by
-	analysis.users.id;
+	au.id;

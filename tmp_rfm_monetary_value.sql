@@ -5,15 +5,14 @@ select
 from
 	analysis.orders
 where
-	status = 'Closed'
+	status = 5
 group by
 	user_id)
-
 insert
 	into
 	analysis.tmp_rfm_monetary_value
 select
-	analysis.users.id as user_id,
+	au.id as user_id,
 	ntile(5) over (
 order by
 	(case
@@ -25,8 +24,7 @@ order by
 		else total_amount
 	end) asc) as monetary_value
 from
-	total_amount_table
-right join analysis.users
-		using(users.id)
+	total_amount_table tat
+right join analysis.users au on tat.user_id=au.id
 order by
-	analysis.users.id;
+	au.id;
