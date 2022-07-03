@@ -5,7 +5,8 @@ select
 from
 	analysis.orders ao
 where
-	status = 4
+	status = 4 
+and order_ts::date >= '2022-01-01'
 group by
 	user_id)
 insert
