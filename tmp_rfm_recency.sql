@@ -5,7 +5,7 @@ select
 from
 	analysis.orders ao
 where
-	status = 5
+	status = 4
 group by
 	user_id)
 insert
