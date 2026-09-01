@@ -1,20 +1,22 @@
-# Проект 1
-Вы выполняете задачу для компании, которая разрабатывает приложения по доставке еды. 
+# RFM customer segmentation data mart
 
-Вам предстоит составить витрину для RFM-классификации пользователей. 
+A data mart that segments the customers of a food delivery service by RFM -
+recency, frequency and monetary value.
 
-**RFM** (англ. Recency Frequency Monetary* Value — давность, частота, деньги) — сегментация клиентов в анализе сбыта по лояльности.
+Each customer gets a score from 1 to 5 on each of the three dimensions, with
+customers distributed evenly across segments. For recency, 1 means the customer
+has not ordered in a long time and 5 means a recent order; for frequency and
+monetary value, 1 is the lowest activity and 5 the highest.
 
-Определяет три группы:
+## Contents
 
-- **R**ecency (давность) — давность с момента последнего заказа.
-- **F**requency (частота) — количество заказов.
-- **M**onetary Value (деньги) — сумма затрат клиента.
+| File | Purpose |
+|---|---|
+| `orders_view.sql`, `views.sql` | source views over the raw tables |
+| `recency.sql`, `frequency.sql`, `monetary_value.sql` | the three RFM metrics |
+| `datamart_ddl.sql` | data mart schema |
+| `datamart_query.sql` | the query that fills it |
+| `data_quality.md` | data quality checks and findings |
+| `requirements.md` | the original task |
 
-Вы должны каждому клиенту присвоить сегмент - число от 1 до 5 - по каждому из трех измерений. При этом границы необходимо подобрать таким образом, чтобы количество коиентов в каждом сегменте было одинаковым.
-
-Например, если в базе всего 100 клиентов, то 20 клиентов должны получить “1”, 20 клиентов должны получить “2” и т.д.
-
-Для Frequency и Monetary Value клиенты располагаются по возрастанию. Т.е. клиенты с наименьшим количеством заказов получат “1” по шкале frequency. Аналогично, клиенты с наименьшей суммой трат получат “1” по шкале monetary value.
-
-Шкала recency меряется по последнему заказу клиента. “1” получат те, кто не делал заказов а так же те, кто делал заказы давно. “5” получат клиенты, делавшие заказы позже остальных, т.е. относительно недавно.
+Written in SQL on PostgreSQL.
